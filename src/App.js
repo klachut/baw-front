@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Articles from './components/Articles';
+import AddArticle from './components/AddArticle';
+import DeleteArticle from './components/DeleteArticle';
+import { AuthProvider, useAuth } from './components/AuthContext';
+import { RoleProvider } from './components/RoleContext';
 
-function App() {
+
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? children : <Navigate to="/login" />;
+};
+const App = () => {
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider >
+      <RoleProvider> 
+    <Router>
+      <Routes>
+      <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+         <Route path="/watki/*" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+          <Route path="/dodaj-watek" element={<ProtectedRoute><AddArticle /></ProtectedRoute>} />
+          <Route path="/usun-watek" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
+          <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
+      </Routes>
+    </Router>
+    </RoleProvider>
+    </AuthProvider>
   );
-}
+};
 
-export default App;
+export default  App;
