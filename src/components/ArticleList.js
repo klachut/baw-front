@@ -55,7 +55,7 @@ const ArticleList = () => {
         <ul>
           {threads === null ? <div>Loading</div>  : threads.map((thread) => (
             <li key={thread.id} className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'>
-              <Link to={`/watki/${thread.id}`}>
+              <Link to={`/watki/${thread.id}/${thread.name}`}>
                 <p className='mb-4'>
                 Temat: {thread.name}
                 </p>

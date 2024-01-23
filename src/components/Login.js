@@ -5,35 +5,36 @@ import { useAuth } from './AuthContext';
 import { useRole } from './RoleContext';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [userName, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const {login} = useAuth();
-    const {setUserRoleFcn} = useRole()
+    const {setUserRoleFcn, setUserNameFcn} = useRole()
+
     const handleLogin = async () => {
-      try {
-        // const response = await fetch('url_do_logowania', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({ username, password }),
-        // });
-    
-        // if (response.ok) {
-        //   const { token } = await response.json();
-        //   login(token);
-        //      navigate('/articles')
-        // } else {
-        //   // Obsłuż błąd logowania
-        // }
-             login("test");
+        try {
+
+          const response = await axios.post('http://localhost:3001/api/auth/login', {
+            login: userName,
+            password: password,
+          });
+
+          console.log(response)
+
+          if(response.status == 200){ 
+          login("loggedIn");
           navigate('/watki')
           setUserRoleFcn('admin')
-      } catch (error) {
-        console.error('Błąd logowania', error);
-      }
+          setUserNameFcn(userName)}
+        
+
+        } catch (error) {
+
+        }
+        
     };
+
+
   
     return (
     //   <div>
@@ -59,18 +60,16 @@ const Login = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <div className="space-y-6" >
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                Username
               </label>
               <div className="mt-2">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  id="username"
+                  name="username"
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  value={email} onChange={(e) => setEmail(e.target.value)} 
+                  value={userName} onChange={(e) => setUsername(e.target.value)} 
                 />
               </div>
             </div>

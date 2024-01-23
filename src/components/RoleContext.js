@@ -6,14 +6,18 @@ const RoleContext = createContext();
 // Funkcja dostarczająca kontekst
 export const RoleProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
-
+  const [userName, setUserName] = useState(null);
   const setUserRoleFcn = (role) => {
     setUserRole(role);
   };
 
+  const setUserNameFcn = (name) => {
+    setUserName(name);
+  };
+
 
   return (
-    <RoleContext.Provider value={{ userRole, setUserRoleFcn }}>
+    <RoleContext.Provider value={{ userRole, userName, setUserRoleFcn, setUserNameFcn}}>
       {children}
     </RoleContext.Provider>
   );
