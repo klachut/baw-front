@@ -15,12 +15,11 @@ const Articles = () => {
 
     //  const responseWhoAmI = await axios.get('http://localhost:3001/api/auth/whoami');
     
-    const responseWhoAmI = await axios.get('http://localhost:3001/api/users');
-      console.log(responseWhoAmI, "response login")
-
-      setUserRoleFcn('admin')
-    
-
+    const res = await fetch('https://localhost:3001/api/auth/whoami', {
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include"
+      });
     } catch (error) {
 
     }
