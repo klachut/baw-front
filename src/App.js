@@ -7,6 +7,7 @@ import AddArticle from './components/AddArticle';
 import DeleteArticle from './components/DeleteArticle';
 import { AuthProvider, useAuth } from './components/AuthContext';
 import { RoleProvider } from './components/RoleContext';
+import ShowUsers from './components/ShowUsers';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -27,7 +28,7 @@ const App = () => {
          <Route path="/watki/*" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
           <Route path="/dodaj-watek" element={<ProtectedRoute><AddArticle /></ProtectedRoute>} />
           <Route path="/usun-watek" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
-          <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
+          <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><ShowUsers /></ProtectedRoute>} />
       </Routes>
     </Router>
     </RoleProvider>

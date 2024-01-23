@@ -1,27 +1,52 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Link, Route, Routes, useNavigate, useParams  } from 'react-router-dom';
 import AllComents from "./AllComents"
+import axios from 'axios'
 const ArticleDetails = () => {
     // Pobranie danych dla konkretnego artykułu - można użyć np. API
     const { articleId = '' } = useParams();
-    const article = { id: articleId, title: `Artykuł ${articleId}`, content: `Treść artykułu ${articleId}` };
- 
-    console.log(articleId)
-    
-  const [articleComment, setArticleComment] = useState('');
+   
+    const [articleComment, setArticleComment] = useState('');
 
-  // Obsługa zmiany wartości w polu tematu
-  // Obsługa zmiany wartości w polu treści
-  //Tutaj będzie połączenie do API, które pobierze treść posta do api
-  // 
   const handleCommentChange = (e) => {
     setArticleComment(e.target.value);
   };
 
+  const [thread, setThread] = useState(null);
+  const [error, setError] = useState(null);
+  const getAllThreads = async () => {
+    try {
+
+      const response = await axios.get(`http://localhost:3001/api/content/messages/${articleId}`);
+      setThread(response.data);
+      console.log(response.data)
+    } catch (error) {
+
+      setError(error.message);
+    }
+  };
+  useEffect(() => {
+
+    getAllThreads();
+  }, []);
+
+  
+
+
+
     return (
      <><div>
-        <p>To jest treść posta</p>
-        <h2>{article.id} tets</h2>
+
+        {thread === null ? <div>Loading</div>  :
+        
+          <div>
+
+            <p>{thread.id}</p>
+          </div>
+        
+        
+        }
+       
         {/* <p>{article.content}</p> */}
 
       </div>
