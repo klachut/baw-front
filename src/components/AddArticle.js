@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
 import Navigation from './Navigation'
+import { useNavigate } from 'react-router-dom';
 
 const AddArticle = () => {
 
-   <Navigation />
-
-     // Stan dla przechowywania wartości tematu i treści artykułu
+  const navigate = useNavigate();
   const [articleTitle, setArticleTitle] = useState('');
   const [articleContent, setArticleContent] = useState('');
 
@@ -20,18 +19,32 @@ const AddArticle = () => {
   };
 
   // Obsługa wysłania formularza
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Tutaj możesz dodać kod obsługi wysłania formularza, np. zapisanie artykułu do bazy danych
-    console.log('Temat artykułu:', articleTitle);
-    console.log('Treść artykułu:', articleContent);
-  };
+  const addNewThread =  async (event) => {
+    event.preventDefault()
+    try {
+      const response = await fetch(
+        "http://localhost:3001/api/content/threads/new",{
+          method: "POST",
+          body: JSON.stringify({
+            title: articleTitle,
+            content: articleContent,
+          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+        navigate('/watki')
+
+    } catch (error) {
+      console.error("Wystąpił błąd:", error);
+    }
+    }
 
   return (
     < >
     <Navigation />
     <div className='mx-auto p-10'>
-      <form onSubmit={handleSubmit} className="flex flex-col mx-auto max-w-7xl rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2">
+      <form className="flex flex-col mx-auto max-w-7xl rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2">
         <div className="mb-4">
           <label htmlFor="articleTitle" className="block text-gray-700 font-bold mb-2">
             Nowy wątek:
@@ -64,7 +77,7 @@ const AddArticle = () => {
           ></textarea>
         </div>
 
-        <button type="submit" className="max-w-40 self-center bg-blue-500 text-white px-4 py-2 rounded">
+        <button  className="max-w-40 self-center bg-blue-500 text-white px-4 py-2 rounded" onClick={addNewThread}>
           Dodaj artykuł
         </button>
       </form>

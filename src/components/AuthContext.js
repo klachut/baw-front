@@ -1,67 +1,62 @@
-// AuthContext.js
-import React, { createContext, useContext, useEffect, useReducer } from 'react';
-
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useRole } from './RoleContext';
 
 const AuthContext = createContext();
 
-const initialState = {
-  isLoggedIn: false,
-  user: null,
-};
-
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case 'LOGIN':
-      return {
-        ...state,
-        isLoggedIn: true,
-        user: action.payload.user,
-      };
-    case 'LOGOUT':
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
-      };
-    default:
-      return state;
-  }
-};
-
 const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const {setUserRoleFcn, setUserNameFcn} = useRole()
+  const [loggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
 
   useEffect(() => {
-    // Sprawdź, czy token istnieje w localStorage i czy jest ważny
-    const token = localStorage.getItem('token');
+    const updateLocalStorage = async () => {
+      localStorage.setItem('isLoggedIn', loggedIn);
+    };
+    updateLocalStorage();
+  }, [loggedIn]);
 
-    if (token) {
-      try {
-        // const decodedToken = jwt.verify(token, 'secret_key'); // Zastąp 'secret_key' swoim sekretnym kluczem
-        dispatch({ type: 'LOGIN', payload: { user: token } });
-      } catch (error) {
-        console.error('Błąd weryfikacji tokenu:', error);
-        // W przypadku błędu weryfikacji tokena, wyloguj użytkownika
-        dispatch({ type: 'LOGOUT' });
-      }
-    }
-  }, []);
+  const login = async  () => {
 
-  const login = (token) => {
-    // Po pomyślnym logowaniu, zapisz token w localStorage i zdekoduj jego zawartość
-    // const decodedToken = jwt.verify(token, 'secret_key'); // Zastąp 'secret_key' swoim sekretnym kluczem
-    localStorage.setItem('token', token);
-    dispatch({ type: 'LOGIN', payload: { user: token } });
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/whoami', {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+          credentials: "include"
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setIsLoggedIn(true);
+        setUserRoleFcn(result.rolename)
+        setUserNameFcn(result.username)
+        localStorage.setItem('isLoggedIn', true);
+    } 
+
+  } catch (error) {
+      console.error("Wystąpił błąd:", error);
+  }
   };
 
-  const logout = () => {
-    // Po wylogowaniu, usuń token z localStorage
-    localStorage.removeItem('token');
-    dispatch({ type: 'LOGOUT' });
+  const logout =async () => {
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/logout', {
+          method: "POST", 
+          headers: {"Content-Type": "application/json"},
+          credentials: "include"
+      });
+  
+      if (res.status == 200) {
+        setIsLoggedIn(false);
+        localStorage.setItem('isLoggedIn', false);
+      }
+  } catch (error) {
+      console.error("Wystąpił błąd:", error);
+  }
+
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ loggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -70,5 +65,5 @@ const AuthProvider = ({ children }) => {
 export { AuthProvider, AuthContext };
 
 export const useAuth = () => {
-    return useContext(AuthContext);
-  };
+  return useContext(AuthContext);
+};

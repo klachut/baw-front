@@ -9,42 +9,29 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const {login} = useAuth();
-    const {setUserRoleFcn, setUserNameFcn} = useRole()
+
 
     const handleLogin = async () => {
         try {
-
-          const response = await axios.post('http://localhost:3001/api/auth/login', {
-            login: userName,
-            password: password,
-          });
-
-          console.log(response)
-
-          if(response.status == 200){ 
-          login("loggedIn");
+          const response = await fetch('http://localhost:3001/api/auth/login', {
+            method: "POST",
+            body: JSON.stringify({
+                login: userName,
+                password: password,
+            }),
+            headers: {"Content-Type": "application/json"},
+            credentials: "include"
+        });
+          await login();
           navigate('/watki')
-          setUserRoleFcn('admin')
-          setUserNameFcn(userName)}
-        
 
         } catch (error) {
-
-        }
-        
+      }
     };
 
 
   
     return (
-    //   <div>
-    //     <h2>Logowanie</h2>
-    //     <input type="text" placeholder="Nazwa użytkownika" value={username} onChange={(e) => setUsername(e.target.value)} />
-    //     <input type="password" placeholder="Hasło" value={password} onChange={(e) => setPassword(e.target.value)} />
-    //     <button onClick={handleLogin}>Zaloguj się</button>
-    //     <p>Nie masz konta? <span onClick={() => history.push('/register')}>Zarejestruj się</span></p>
-    //   </div>
-
        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img

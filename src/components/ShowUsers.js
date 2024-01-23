@@ -48,7 +48,6 @@ const ShowUsers = () => {
       if (selectedOption !== null) {
         axios.post('URL_DO_API', { selectedOption })
           .then(response => {
-            console.log('Dane wysłane pomyślnie!', response.data);
             // Tutaj możesz dodać dodatkową obsługę po pomyślnym wysłaniu danych
           })
           .catch(error => {

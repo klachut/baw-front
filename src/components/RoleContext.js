@@ -7,6 +7,7 @@ const RoleContext = createContext();
 export const RoleProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState(null);
+  
   const setUserRoleFcn = (role) => {
     setUserRole(role);
   };

@@ -4,34 +4,21 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import {  Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useRole } from './RoleContext';
-const navigation = [
-  { name: 'Wątki', href: '/watki', admin: false},
-  { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
-  { name: 'Usuń wątek', href: '/usun-watek', admin: false },
-  
-]
 
-const adminNavigation  = [
-  { name: 'Wątki', href: '/watki', admin: false},
-  { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
-  { name: 'Usuń wątek', href: '/usun-watek', admin: false },
-  { name: 'Pokaż użytkowników ', href: '/pokaz-uzytkownikow', admin: true },
-]
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Navigation() {
+export default function UnloggedNavigation() {
   const {logout} = useAuth();
   const navigate = useNavigate();
   const {userRole} = useRole()
-  const [navigationVariable, setNavigationVariable] = useState(navigation)
+
 
   useEffect(()=> {
-    setNavigationVariable(userRole == 'Admin' ? adminNavigation : navigation)
+   
   }, [])
-  const handleLogOut = () => {
-    logout()
+  const handleLogin = () => {
     navigate("/login")
   }
   return (
@@ -62,25 +49,13 @@ export default function Navigation() {
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
-                    {navigationVariable.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium'
-                        )}
-                        aria-current={item.current ? 'page' : undefined}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+
                   </div>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
  
-                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-2 py-1 text-xs font-medium text-white " onClick={handleLogOut}> Log out</button>
+                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-2 py-1 text-xs font-medium text-white " onClick={handleLogin}> Log in</button>
                          
               </div>
             </div>

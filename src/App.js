@@ -11,28 +11,30 @@ import ShowUsers from './components/ShowUsers';
 
 
 const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn } = useAuth();
-  return isLoggedIn ? children : <Navigate to="/login" />;
+  const { loggedIn } = useAuth();
+  return loggedIn ? children : <Navigate to="/login" />;
 };
 const App = () => {
 
 
   return (
+    <RoleProvider> 
     <AuthProvider >
-      <RoleProvider> 
+
     <Router>
       <Routes>
       <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-         <Route path="/watki/*" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+         <Route path="/watki/*" element={<Articles /> } />
           <Route path="/dodaj-watek" element={<ProtectedRoute><AddArticle /></ProtectedRoute>} />
           <Route path="/usun-watek" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
           <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><ShowUsers /></ProtectedRoute>} />
       </Routes>
     </Router>
-    </RoleProvider>
+
     </AuthProvider>
+    </RoleProvider>
   );
 };
 
