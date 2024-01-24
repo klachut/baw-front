@@ -23,8 +23,10 @@ const DeleteArticle = () => {
 
   useEffect(() => {
     getAllThreads();
-    console.log(userName, userRole)
+
   }, []);
+
+  
   return (
     <>
       <Navigation />

@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Link, Route, Routes, useNavigate, useParams } from "react-router-dom";
-import AllComents from "./AllComents";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useRole } from "./RoleContext";
+
+
+
 const ArticleDetails = () => {
-  // Pobranie danych dla konkretnego artykułu - można użyć np. API
   const { articleId = "", articleName = "" } = useParams();
-  const {userName, userRole} = useRole()
+  const { userName, userRole } = useRole()
+
   const [toogleAddComments, setAddComments] = useState(false);
   const [articleComment, setArticleComment] = useState("");
+  const [thread, setThread] = useState(null);
+  const [error, setError] = useState(null);
+
+
   const handleCommentChange = (e) => {
     setArticleComment(e.target.value);
   };
 
-  const [thread, setThread] = useState(null);
-  const [error, setError] = useState(null);
+
   const getAllThreads = async () => {
     try {
       const response = await axios.get(
@@ -42,7 +47,6 @@ const ArticleDetails = () => {
       );
 
       getAllThreads();
-      // Sprawdzamy, czy odpowiedź jest w porządku (status 2xx)
     } catch (error) {
       console.error("Wystąpił błąd:", error);
     }
@@ -67,6 +71,30 @@ const ArticleDetails = () => {
       console.error("Wystąpił błąd:", error);
     }
   }
+
+
+  const banUser = async (x) => {
+    try {
+      const response = await fetch(
+        "http://localhost:3001/api/users/ban",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            username: x,
+            state: true
+          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      getAllThreads();
+    } catch (error) {
+      console.error("Wystąpił błąd:", error);
+    }
+  }
+
+
   useEffect(() => {
     getAllThreads();
   }, []);
@@ -79,17 +107,16 @@ const ArticleDetails = () => {
         <div className="mb-10">
           <p className="text-xl font-bold">Temat: {articleName}</p>
         </div>
-
-        {/* <p>{article.content}</p> */}
       </div>
 
-      <button
+
+{  userRole != 'Admin' &&   <button
         className=" mt-4 mb-5 mx-auto bg-blue-300 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => setAddComments(!toogleAddComments)}
       >
-        {toogleAddComments ? "Ukryj dodawanie komentarza" : "Pokaż dodawanie komentarza"}
-      </button>
-      {toogleAddComments && (
+        {(toogleAddComments ) ? "Ukryj dodawanie komentarza" : "Pokaż dodawanie komentarza"}
+      </button>}
+      {toogleAddComments  && (
         <div className="mb-10 rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2">
           <label className="block text-gray-700 font-bold mb-2">
             Pytanie do wątku:
@@ -119,18 +146,22 @@ const ArticleDetails = () => {
       ) : (
         <div className="mb-5">
           {thread.map((comment) => (
-           <> <div
+            <> <div
               key={comment.id}
               className="rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2 relative"
             >
               <p className="mb-5">{comment.content}</p>
               <p className="mb-5">Komentarz użytkownika: {comment.author}</p>
-              {  (userName == comment.author  || userRole == 'Content Moderator'|| userRole == 'Admin' || userRole == 'Community Moderator'  ) && <button className=" text-red-600 absolute bottom-0 right-0 p-2" onClick={() => deteleComment(comment.id)}>
-              Usuń komentarz
-            </button>}
+              {(userName == comment.author || userRole == 'Content Moderator' || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0 right-0 p-2" onClick={() => deteleComment(comment.id)}>
+                Usuń komentarz
+              </button>}
+
+              {(userName == comment.author || userRole == 'Content Moderator' || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0  right-32 p-2" onClick={() => banUser(comment.author)}>
+                Zbanuj użytkownika
+              </button>}
             </div>
 
-            
+
             </>
           ))}
         </div>

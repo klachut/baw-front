@@ -13,7 +13,7 @@ const navigation = [
 
 const adminNavigation  = [
   { name: 'Wątki', href: '/watki', admin: false},
-  { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
+  // { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
   { name: 'Usuń wątek', href: '/usun-watek', admin: false },
   { name: 'Pokaż użytkowników ', href: '/pokaz-uzytkownikow', admin: true },
 ]
@@ -28,12 +28,15 @@ export default function Navigation() {
   const [navigationVariable, setNavigationVariable] = useState(navigation)
 
   useEffect(()=> {
-    setNavigationVariable(userRole == 'Admin' ? adminNavigation : navigation)
+    setNavigationVariable(userRole == 'Admin'   ? adminNavigation : navigation)
   }, [])
+
   const handleLogOut = () => {
     logout()
     navigate("/login")
   }
+
+  
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (

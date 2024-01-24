@@ -18,24 +18,24 @@ const App = () => {
 
 
   return (
-    <RoleProvider> 
-    <AuthProvider >
+    <RoleProvider>
+      <AuthProvider >
 
-    <Router>
-      <Routes>
-      <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-         <Route path="/watki/*" element={<Articles /> } />
-          <Route path="/dodaj-watek" element={<ProtectedRoute><AddArticle /></ProtectedRoute>} />
-          <Route path="/usun-watek" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
-          <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><ShowUsers /></ProtectedRoute>} />
-      </Routes>
-    </Router>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/watki/*" element={<Articles />} />
+            <Route path="/dodaj-watek" element={<ProtectedRoute><AddArticle /></ProtectedRoute>} />
+            <Route path="/usun-watek" element={<ProtectedRoute><DeleteArticle /></ProtectedRoute>} />
+            <Route path="/pokaz-uzytkownikow" element={<ProtectedRoute><ShowUsers /></ProtectedRoute>} />
+          </Routes>
+        </Router>
 
-    </AuthProvider>
+      </AuthProvider>
     </RoleProvider>
   );
 };
 
-export default  App;
+export default App;

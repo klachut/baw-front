@@ -8,17 +8,15 @@ const AddArticle = () => {
   const [articleTitle, setArticleTitle] = useState('');
   const [articleContent, setArticleContent] = useState('');
 
-  // Obsługa zmiany wartości w polu tematu
   const handleTitleChange = (e) => {
     setArticleTitle(e.target.value);
   };
 
-  // Obsługa zmiany wartości w polu treści
   const handleContentChange = (e) => {
     setArticleContent(e.target.value);
   };
 
-  // Obsługa wysłania formularza
+
   const addNewThread =  async (event) => {
     event.preventDefault()
     try {

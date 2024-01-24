@@ -1,70 +1,98 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
 import axios from 'axios';
+import { useRole } from './RoleContext';
 
 const ShowUsers = () => {
-    // Przykładowe dane - możesz je zamienić na rzeczywiste dane
-    const articles = [ {
-      temat: "test1",
-      content: "to jest content",
-      id: 1
-    },
-    {
-      temat: "test2",
-      content: "to jest inny content",
-      id: 2
-    },
-    {
-      temat: "test3",
-      content: "kolejny content",
-      id: 3
-    },
-    {
-      temat: "test4",
-      content: "inny inny content",
-      id: 4
-    },
-    {
-      temat: "test5",
-      content: "content content",
-      id: 5
-    }]
 
-    const options = ["Opcja 1", "Opcja 2", "Opcja 3", "Opcja 4"];
-    const [selectedOption, setSelectedOption] = useState(null);
-    const handleCheckboxChange = (option) => {
-      if (selectedOption === option) {
-        // Jeśli ta opcja jest już zaznaczona, odznacz ją
-        setSelectedOption(null);
-      } else {
-        // W przeciwnym razie zaznacz nową opcję
-        setSelectedOption(option);
-      }
+    const options = ["Admin", "User", "Content Moderator", "Community moderator"];
+    const [selectedOptions, setSelectedOptions] = useState({})
+    const [users, setAllUsers] = useState()
+    const {userRole, userName} = useRole()
+
+
+    const handleCheckboxChange = (username, option) => {
+      setSelectedOptions((prevSelectedOptions) => ({
+        ...prevSelectedOptions,
+        [username]: option,
+      }));
     };
+  
 
-    const handleAcceptClick = () => {
-      // Wysyłanie danych do API za pomocą Axios
+    const handleAcceptClick = async (x) => {
+      const selectedOption = selectedOptions[x];
       if (selectedOption !== null) {
-        axios.post('URL_DO_API', { selectedOption })
-          .then(response => {
-            // Tutaj możesz dodać dodatkową obsługę po pomyślnym wysłaniu danych
-          })
-          .catch(error => {
-            console.error('Błąd podczas wysyłania danych do API:', error);
-            // Tutaj możesz obsłużyć błędy wysyłania danych do API
+        try {
+          const response = await fetch(
+            "http://localhost:3001/api/users/role",{
+              method: "POST",
+              body: JSON.stringify({
+                rolename: selectedOption,
+                username: x,
+              }),
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+            }
+          );
+
+            // getAllUsers()
+        } catch (error) {
+          console.error("Wystąpił błąd:", error);
+        }
+    };}
+
+
+    const  getAllUsers = async () =>{
+        try {
+          const res = await fetch('http://localhost:3001/api/users', {
+              method: "GET",
+              headers: {"Content-Type": "application/json"},
+              credentials: "include"
           });
-      } else {
-        console.warn('Wybierz opcję przed kliknięciem Zaakceptuj.');
+          if (res.ok) {
+            const result = await res.json();
+            console.log(result)
+            setAllUsers(result)
+        } 
+    
+      } catch (error) {
+          console.error("Wystąpił błąd:", error);
       }
-    };
+
+      }
+
+      const banUser = async (x) => {
+        try {
+          const response = await fetch(
+            "http://localhost:3001/api/users/ban",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                username: x,
+                state: true
+              }),
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+            }
+          );
+          getAllUsers()
+        } catch (error) {
+          console.error("Wystąpił błąd:", error);
+        }
+      }
+      useEffect(() => {
+        // handleCheckboxChange(userRole)
+        getAllUsers()
+      }, [])
     return (
     <>
     <Navigation />
     <div className='mx-auto p-10'>
       <h2>Lista użytkowników</h2>
-      <div className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'> 
-        Username: kotek
+      {users === null || users ==undefined ? <div>Loading</div> :  users.map((x, index) => (
+        <div  key = {index} className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'> 
+        Username: {x.username}
         <p> 
           Nadaj dodatkowe upraweniania:
         </p>
@@ -74,30 +102,41 @@ const ShowUsers = () => {
             <input
               type="checkbox"
               className="form-checkbox rounded-md text-blue-500 focus:ring-blue-400"
-              checked={selectedOption === option}
-              onChange={() => handleCheckboxChange(option)}
+
+              onChange={() => { handleCheckboxChange(x.username, option) }}
             />
             <span className="text-gray-700">{option}</span>
           </label>
         ))}
+
+<p> 
+          Obecna rola: {x.rolename}
+        </p>
+        <p> 
+          Czy zbanowany: {x.banned? "Tak" : "Nie"}
+        </p>
       </div>
       <div className='flex gap-10'> 
+
       <button
-        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handleAcceptClick}
+       className={`mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+        onClick={()=> handleAcceptClick(x.username)}
+    
       >
         Zaakceptuj
       </button>
 
       <button
-        className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handleAcceptClick}
-      >
-        Zbanuj użytkownika
-      </button>
+  className={`mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded`}
+  onClick={() => banUser(x.username)}
 
+>
+  Zbanuj użytkownika
+</button>
       </div>
       </div>
+      ))}
+      
 
       {/* <ul>
         {articles.map((article) => (
