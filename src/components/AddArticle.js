@@ -1,13 +1,16 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import Navigation from './Navigation'
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddArticle = () => {
 
   const navigate = useNavigate();
   const [articleTitle, setArticleTitle] = useState('');
   const [articleContent, setArticleContent] = useState('');
-
+  const {login} = useAuth();
   const handleTitleChange = (e) => {
     setArticleTitle(e.target.value);
   };
@@ -31,16 +34,49 @@ const AddArticle = () => {
           credentials: "include",
         }
       );
-        navigate('/watki')
 
+      if(response.status == 200)
+      { 
+        
+        toast.success('Udało się dodać wątek!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+        setTimeout(() => {
+          navigate('/watki')
+        }, 2000)
+      }
+      else {
+        toast.error('Nie udało się dodać wątku', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
     } catch (error) {
       console.error("Wystąpił błąd:", error);
     }
     }
 
+
+    useEffect(() => {
+      login()
+    }, [])
   return (
     < >
     <Navigation />
+    <ToastContainer />
     <div className='mx-auto p-10'>
       <form className="flex flex-col mx-auto max-w-7xl rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2">
         <div className="mb-4">

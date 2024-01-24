@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const ArticleList = () => {
 
 
   const [threads, setThreads] = useState(null);
   const [error, setError] = useState(null);
+  const {login} = useAuth();
+  
   const getAllThreads = async () => {
     try {
 
@@ -17,8 +20,14 @@ const ArticleList = () => {
       setError(error.message);
     }
   };
-  useEffect(() => {
+  const formatTimestamp = (timestamp) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    const formattedDate = new Date(timestamp).toLocaleDateString('pl-PL', options);
+    return formattedDate;
+  };
 
+  useEffect(() => {
+    login()
     getAllThreads();
   }, []);
 
@@ -36,7 +45,7 @@ const ArticleList = () => {
               </p>
               <div className='flex  justify-between'>
                 <p> Autor: {thread.author}</p>
-                <p> Utworzono: {thread.created_on}</p>
+                <p> Utworzono: {formatTimestamp(thread.created_on)}</p>
               </div>
 
 

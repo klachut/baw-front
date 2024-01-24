@@ -3,14 +3,17 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
 import axios from 'axios';
 import { useRole } from './RoleContext';
+import { useAuth } from './AuthContext';
 
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 const ShowUsers = () => {
 
     const options = ["Admin", "User", "Content Moderator", "Community moderator"];
     const [selectedOptions, setSelectedOptions] = useState({})
     const [users, setAllUsers] = useState()
     const {userRole, userName} = useRole()
-
+    const {login} = useAuth();
 
     const handleCheckboxChange = (username, option) => {
       setSelectedOptions((prevSelectedOptions) => ({
@@ -35,12 +38,38 @@ const ShowUsers = () => {
               credentials: "include",
             }
           );
-
-            // getAllUsers()
-        } catch (error) {
-          console.error("Wystąpił błąd:", error);
-        }
-    };}
+          if(response.status == 200)
+          { 
+            getAllUsers()
+                toast.success('Zmieniono uprawnienia!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+      
+                });
+              }
+                else {
+                  toast.error('Nie zmieniono uprawnień!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                  });
+                }
+              } catch (error) {
+                // Dodanie powiadomienia toastify po błędzie logowania
+      
+              }
+            };}
 
 
     const  getAllUsers = async () =>{
@@ -50,17 +79,41 @@ const ShowUsers = () => {
               headers: {"Content-Type": "application/json"},
               credentials: "include"
           });
-          if (res.ok) {
-            const result = await res.json();
-            console.log(result)
-            setAllUsers(result)
-        } 
     
-      } catch (error) {
-          console.error("Wystąpił błąd:", error);
-      }
-
-      }
+        if(res.status == 200)
+        { 
+          const result = await res.json();
+          console.log(result)
+          setAllUsers(result)
+              toast.success('Pobrano użytkowników!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+    
+              });
+            }
+              else {
+                toast.error('Nie udało się pobrać użytkowników!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+                });
+              }
+            } catch (error) {
+              // Dodanie powiadomienia toastify po błędzie logowania
+    
+            }
+          }
 
       const banUser = async (x) => {
         try {
@@ -76,18 +129,48 @@ const ShowUsers = () => {
               credentials: "include",
             }
           );
-          getAllUsers()
-        } catch (error) {
-          console.error("Wystąpił błąd:", error);
-        }
-      }
+          if(response.status == 200)
+          { 
+getAllUsers()
+                toast.success('Zbanowano użytkownika!', {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+      
+                });
+              }
+                else {
+                  toast.error('Nie udało się zbanować użytkownika!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                  });
+                }
+              } catch (error) {
+                // Dodanie powiadomienia toastify po błędzie logowania
+      
+              }
+            }
+  
       useEffect(() => {
         // handleCheckboxChange(userRole)
         getAllUsers()
+        login()
       }, [])
     return (
     <>
     <Navigation />
+    <ToastContainer />
     <div className='mx-auto p-10'>
       <h2>Lista użytkowników</h2>
       {users === null || users ==undefined ? <div>Loading</div> :  users.map((x, index) => (

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useRole } from "./RoleContext";
-
+import { useAuth } from "./AuthContext";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 
 
 const ArticleDetails = () => {
@@ -13,7 +15,7 @@ const ArticleDetails = () => {
   const [articleComment, setArticleComment] = useState("");
   const [thread, setThread] = useState(null);
   const [error, setError] = useState(null);
-
+  const {login} = useAuth();
 
   const handleCommentChange = (e) => {
     setArticleComment(e.target.value);
@@ -25,7 +27,33 @@ const ArticleDetails = () => {
       const response = await axios.get(
         `http://localhost:3001/api/content/messages/${articleId}`
       );
-      setThread(response.data);
+      
+      if(response.status == 200){
+        setThread(response.data);
+
+        toast.success('Pobranie wątków powiodło się!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+      }
+      else {
+        toast.error('Nie pobrano wątków', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
     } catch (error) {
       setError(error.message);
     }
@@ -45,11 +73,37 @@ const ArticleDetails = () => {
           credentials: "include",
         }
       );
+      if(response.status == 200){
+        getAllThreads();
 
-      getAllThreads();
+        toast.success('Komentarz dodano!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+      }
+      else {
+        toast.error('Nie udało się dodać komentarza', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
     } catch (error) {
-      console.error("Wystąpił błąd:", error);
+      setError(error.message);
     }
+   
+
   };
 
   const deteleComment = async (id) => {
@@ -65,12 +119,39 @@ const ArticleDetails = () => {
           credentials: "include",
         }
       );
+      if(response.status == 200){
+        getAllThreads();
 
-      getAllThreads();
+        toast.success('Komentarz usunięty!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+      }
+      else {
+        toast.error('Nie udało się usunąć komentarza!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
     } catch (error) {
-      console.error("Wystąpił błąd:", error);
+      setError(error.message);
     }
-  }
+   
+
+  };
+
 
 
   const banUser = async (x) => {
@@ -88,17 +169,44 @@ const ArticleDetails = () => {
         }
       );
 
-      getAllThreads();
+      if(response.status == 200){
+        getAllThreads();
+
+        toast.success('Użytkownik został zbanowany', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+      }
+      else {
+        toast.error('Nie udało się zbanować użytkownika', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
     } catch (error) {
-      console.error("Wystąpił błąd:", error);
+      setError(error.message);
     }
-  }
+   
+
+  };
 
 
   useEffect(() => {
     getAllThreads();
+    login()
   }, []);
-
 
 
   return (
@@ -108,7 +216,7 @@ const ArticleDetails = () => {
           <p className="text-xl font-bold">Temat: {articleName}</p>
         </div>
       </div>
-
+      <ToastContainer />
 
 {  userRole != 'Admin' &&   <button
         className=" mt-4 mb-5 mx-auto bg-blue-300 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -156,7 +264,7 @@ const ArticleDetails = () => {
                 Usuń komentarz
               </button>}
 
-              {(userName == comment.author || userRole == 'Content Moderator' || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0  right-32 p-2" onClick={() => banUser(comment.author)}>
+              {(userName == comment.author  || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0  right-32 p-2" onClick={() => banUser(comment.author)}>
                 Zbanuj użytkownika
               </button>}
             </div>

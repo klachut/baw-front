@@ -1,9 +1,9 @@
-import React from 'react'
+// import React from 'react'
 
-const AllComents = ({id}) => {
-  return (
-    <div>{id}</div>
-  )
-}
+// const AllComents = ({id}) => {
+//   return (
+//     <div>{id}</div>
+//   )
+// }
 
-export default AllComents
+// export default AllComents

@@ -22,13 +22,16 @@ function classNames(...classes) {
 }
 
 export default function Navigation() {
-  const {logout} = useAuth();
+  const {logout, login} = useAuth();
   const navigate = useNavigate();
   const {userRole} = useRole()
   const [navigationVariable, setNavigationVariable] = useState(navigation)
 
   useEffect(()=> {
+    login()
     setNavigationVariable(userRole == 'Admin'   ? adminNavigation : navigation)
+
+    
   }, [])
 
   const handleLogOut = () => {

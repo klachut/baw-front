@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 import { useRole } from './RoleContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
 
@@ -23,12 +25,42 @@ const Login = () => {
             headers: {"Content-Type": "application/json"},
             credentials: "include"
         });
-          await login();
-          navigate('/watki')
 
+        if(response.status == 200)
+    {      await login();
+          
+          toast.success('Użytkownik zalogowany!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+
+          });
+          setTimeout(() => {
+            navigate('/watki')
+          }, 2000);
+        }
+          else {
+            toast.error('Nie udało się zalogować!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }
         } catch (error) {
-      }
-    };
+          // Dodanie powiadomienia toastify po błędzie logowania
+
+        }
+      };
 
 
   
@@ -41,7 +73,7 @@ const Login = () => {
             alt="Your Company"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+            Zaloguj się do swojego konta!
           </h2>
         </div>
 
@@ -49,7 +81,7 @@ const Login = () => {
           <div className="space-y-6" >
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
+                Nazwa użytkownika
               </label>
               <div className="mt-2">
                 <input
@@ -65,7 +97,7 @@ const Login = () => {
             <div>
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
+                  Hasło
                 </label>
               </div>
               <div className="mt-2">
@@ -92,12 +124,13 @@ const Login = () => {
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{' '}
+            Nie masz konta? {"  "}
             <Link to="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-             Register now
+             Zarejestruj się!
             </Link>
           </p>
         </div>
+        <ToastContainer />
       </div>
     );
 }

@@ -13,10 +13,13 @@ const ProtectedRoute = ({ children }) => {
   return loggedIn ? children : <Navigate to="/login" />;
 };
 const Articles = () => {
-  const { loggedIn } = useAuth()
+  const { loggedIn, login } = useAuth()
 
 
+  useEffect(() => {
+    login()
 
+  }, []);
   return (
     <>{loggedIn ? <Navigation /> : <UnloggedNavigation />}
       <div className='mx-auto p-10'>

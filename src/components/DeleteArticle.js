@@ -3,12 +3,16 @@ import axios from "axios";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import Navigation from "./Navigation";
 import { useRole } from "./RoleContext";
+import { useAuth } from "./AuthContext";
+
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 
 const DeleteArticle = () => {
   const { userName, userRole } = useRole();
   const [threads, setThreads] = useState(null);
   const [error, setError] = useState(null);
-
+  const {login} = useAuth();
   
   const getAllThreads = async () => {
     try {
@@ -21,15 +25,60 @@ const DeleteArticle = () => {
     }
   };
 
+const deleteArticle = async (x) => {
+    try {
+      const response = await fetch(
+        "http://localhost:3001/api/content/thread/delete",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            threadid: x,
+          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      if(response.status == 200){
+        getAllThreads();
+        toast.success('Wątek usunięty!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+
+        });
+      }
+      else {
+        toast.error('Nie udało się usunąć wątku!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });}
+    } catch (error) {
+      setError(error.message);
+    }
+   
+}
+
   useEffect(() => {
     getAllThreads();
-
+    login()
   }, []);
 
   
   return (
     <>
       <Navigation />
+      <ToastContainer />
       <div className="mx-auto p-10">
         <h2>Lista Twoich artykułów</h2>
         <ul>
@@ -47,13 +96,12 @@ const DeleteArticle = () => {
                 <p> Utworzono: {thread.created_on}</p>
               </div>
             </Link>
-            {userName } name {thread.author}
             {(userName == thread.author ||
               userRole == "Content Moderator" ||
-              userRole == "Admin" ||
-              userRole == "Community Moderator") && (
-              <button className="absolute right-0 m-3 bottom-0   text-red-600 font-bold max-h-10 px-4 rounded border border-red-500 shadow-md">
-                Delete this article
+              userRole == "Admin"
+              ) && (
+              <button className="absolute right-0 m-3 bottom-0   text-red-600 font-bold max-h-10 px-4 rounded border border-red-500 shadow-md" onClick={() => {deleteArticle(thread.id)}}>
+                Usuń artykuł
               </button>
             )}
           </li>
@@ -75,8 +123,8 @@ const DeleteArticle = () => {
                userRole == "Content Moderator" ||
                userRole == "Admin" ||
                userRole == "Community Moderator") && (
-               <button className="absolute right-0 m-3 bottom-0   text-red-600 font-bold max-h-10 px-4 rounded border border-red-500 shadow-md">
-                 Delete this article
+               <button className="absolute right-0 m-3 bottom-0   text-red-600 font-bold max-h-10 px-4 rounded border border-red-500 shadow-md" onClick={() => {deleteArticle(thread.id)}}>
+                 Usuń wątek
                </button>
              )}
            </li>

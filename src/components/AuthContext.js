@@ -30,7 +30,12 @@ const AuthProvider = ({ children }) => {
         setUserRoleFcn(result.rolename)
         setUserNameFcn(result.username)
         localStorage.setItem('isLoggedIn', true);
-    } 
+    } else {
+      setIsLoggedIn(false);
+      setUserRoleFcn("")
+      setUserNameFcn("")
+      localStorage.setItem('isLoggedIn', false);
+    }
 
   } catch (error) {
       console.error("Wystąpił błąd:", error);
