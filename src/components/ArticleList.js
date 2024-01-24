@@ -34,7 +34,7 @@ const ArticleList = () => {
 
 
   return (
-    <div>
+    <div className='mx-auto max-w-7xl px-10'>
       <h2>Lista wątków</h2>
       <ul>
         {threads === null ? <div>Loading</div> : threads.map((thread) => (

@@ -28,7 +28,7 @@ const DeleteArticle = () => {
 const deleteArticle = async (x) => {
     try {
       const response = await fetch(
-        "http://localhost:3001/api/content/thread/delete",
+        "http://localhost:3001/api/content/threads/delete",
         {
           method: "POST",
           body: JSON.stringify({
@@ -76,10 +76,10 @@ const deleteArticle = async (x) => {
 
   
   return (
-    <>
+    <div className="">
       <Navigation />
       <ToastContainer />
-      <div className="mx-auto p-10">
+      <div className="mx-auto max-w-7xl p-5">
         <h2>Lista Twoich artykułów</h2>
         <ul>
           { userRole == 'User' ? 
@@ -131,7 +131,7 @@ const deleteArticle = async (x) => {
            ))) }
         </ul>
       </div>
-    </>
+    </div>
   );
 };
 

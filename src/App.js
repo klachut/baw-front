@@ -12,7 +12,7 @@ import ShowUsers from './components/ShowUsers';
 
 const ProtectedRoute = ({ children }) => {
   const { loggedIn } = useAuth();
-  return loggedIn ? children : <Navigate to="/login" />;
+  return loggedIn ? <div className=''>{children} </div>: <Navigate to="/login" />;
 };
 const App = () => {
 

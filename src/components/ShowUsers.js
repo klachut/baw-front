@@ -9,7 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 const ShowUsers = () => {
 
-    const options = ["Admin", "User", "Content Moderator", "Community moderator"];
+    const options = ["Admin", "User", "Content Moderator", "Community Moderator"];
     const [selectedOptions, setSelectedOptions] = useState({})
     const [users, setAllUsers] = useState()
     const {userRole, userName} = useRole()
@@ -25,6 +25,7 @@ const ShowUsers = () => {
 
     const handleAcceptClick = async (x) => {
       const selectedOption = selectedOptions[x];
+      console.log(selectedOption, x)
       if (selectedOption !== null) {
         try {
           const response = await fetch(
@@ -171,7 +172,7 @@ getAllUsers()
     <>
     <Navigation />
     <ToastContainer />
-    <div className='mx-auto p-10'>
+    <div className='mx-auto max-w-7xl p-5'>
       <h2>Lista użytkowników</h2>
       {users === null || users ==undefined ? <div>Loading</div> :  users.map((x, index) => (
         <div  key = {index} className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'> 

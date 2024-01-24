@@ -86,7 +86,7 @@ export default function Navigation() {
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
  
-                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-2 py-1 text-xs font-medium text-white " onClick={handleLogOut}> Log out</button>
+                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-3 py-2 text-base font-bold text-white " onClick={handleLogOut}> Log out</button>
                          
               </div>
             </div>

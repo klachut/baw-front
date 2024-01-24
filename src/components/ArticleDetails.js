@@ -210,8 +210,8 @@ const ArticleDetails = () => {
 
 
   return (
-    <>
-      <div>
+    <div className="mx-auto max-w-7xl px-10">
+      <div >
         <div className="mb-10">
           <p className="text-xl font-bold">Temat: {articleName}</p>
         </div>
@@ -263,8 +263,8 @@ const ArticleDetails = () => {
               {(userName == comment.author || userRole == 'Content Moderator' || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0 right-0 p-2" onClick={() => deteleComment(comment.id)}>
                 Usuń komentarz
               </button>}
-
-              {(userName == comment.author  || userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0  right-32 p-2" onClick={() => banUser(comment.author)}>
+            
+              {( userRole == 'Admin' || userRole == 'Community Moderator') && <button className=" text-red-600 absolute bottom-0  right-32 p-2" onClick={() => banUser(comment.author)}>
                 Zbanuj użytkownika
               </button>}
             </div>
@@ -274,7 +274,7 @@ const ArticleDetails = () => {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
