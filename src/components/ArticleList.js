@@ -1,75 +1,68 @@
-import React, {useState, useEffect} from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import { toast} from 'react-toastify';
+import { useStyles } from './StylesContext';
 
-import ArticleDetails from './ArticleDetails';
 const ArticleList = () => {
-    // Przykładowe dane - możesz je zamienić na rzeczywiste dane
-    const articles = [ {
-        temat: "test1",
-        content: "to jest content",
-        id: 1
-      },
-      {
-        temat: "test2",
-        content: "to jest inny content",
-        id: 2
-      },
-      {
-        temat: "test3",
-        content: "kolejny content",
-        id: 3
-      },
-      {
-        temat: "test4",
-        content: "inny inny content",
-        id: 4
-      },
-      {
-        temat: "test5",
-        content: "content content",
-        id: 5
-      }]
-  
 
-      const [threads, setThreads] = useState(null);
-      const [error, setError] = useState(null);
-      const getAllThreads = async () => {
-        try {
 
-          const response = await axios.get('http://localhost:3001/api/content/threads');
-          setThreads(response.data);
-        } catch (error) {
+  const [threads, setThreads] = useState(undefined);
+  const [error, setError] = useState(null);
+  const {user, unAuthedGet} = useAuth();
+  const styles = useStyles();
 
-          setError(error.message);
-        }
-      };
-      useEffect(() => {
-
-        getAllThreads();
-      }, []);
-    return (
-      <div>
-        <h2>Lista wątków</h2>
-        <ul>
-          {threads === null ? <div>Loading</div>  : threads.map((thread) => (
-            <li key={thread.id} className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'>
-              <Link to={`/watki/${thread.id}/${thread.name}`}>
-                <p className='mb-4'>
-                Temat: {thread.name}
-                </p>
-                <div className='flex  justify-between'>
-                  <p> Autor: {thread.author}</p>
-                  <p> Utworzono: {thread.created_on}</p>
-                </div>
-
-               
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+  const getAllThreads = async () => {
+    try {
+      const response = await unAuthedGet('/api/content/threads');
+      if(response === null)
+        throw 'error'
+      setThreads(await response.json());
+    } catch (error) {
+      setThreads(null);
+      toast.error('Nie udało się pobrać wiadomości', styles.toast);
+    }
+  };
+  const formatTimestamp = (timestamp) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    const formattedDate = new Date(timestamp).toLocaleDateString('pl-PL', options);
+    return formattedDate;
   };
 
-  export default ArticleList
+  useEffect(() => {
+    getAllThreads();
+  }, []);
+
+
+
+  return (
+    <div className='mx-auto max-w-7xl px-10'>
+      <h2>Lista wątków</h2>
+      <ul>
+        {        threads === undefined ?
+                  <div className={styles.contentCard}> Loading</div>
+                :
+                threads === null?
+                  <div className={styles.contentCard}>Could not load threads</div>
+                :
+                 threads.map((thread) => (
+          <li key={thread.id} className='rounded-lg overflow-hidden border border-gray-300 shadow-lg p-4 my-2'>
+            <Link to={`/watki/${thread.id}/${thread.name}`}>
+              <p className='mb-4'>
+                Temat: {thread.name}
+              </p>
+              <div className='flex  justify-between'>
+                <p> Autor: {thread.author}</p>
+                <p> Utworzono: {formatTimestamp(thread.created_on)}</p>
+              </div>
+
+
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ArticleList

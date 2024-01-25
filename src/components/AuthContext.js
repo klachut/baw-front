@@ -1,62 +1,132 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRole } from './RoleContext';
+import { useNavigate, Link } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const {setUserRoleFcn, setUserNameFcn} = useRole()
-  const [loggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('isLoggedIn') === 'true';
-  });
+  const [user, setUser] = useState(null)
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const updateLocalStorage = async () => {
-      localStorage.setItem('isLoggedIn', loggedIn);
-    };
-    updateLocalStorage();
-  }, [loggedIn]);
 
-  const login = async  () => {
+  const unAuthedGet = async (path) => {
+    try {
+      const res = await fetch(`http://localhost:3001${path}`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+          credentials: "include"
+      });
+      if(res.status!==200)
+        throw new Error('error');
+      return res
+    }
+    catch (error){
+      return null;
+    }
+  }
 
+
+    const unAuthedPost = async (path, body) => {
+      try{
+        const result = await fetch(`http://localhost:3001${path}`, {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        if(result.status!==200)
+          throw new Error('error');
+
+        return result;
+
+      }
+      catch(error){
+        return null;
+      }
+    }
+
+
+  const authedGet =  async (path) => {
+    try {
+      const res = await fetch(`http://localhost:3001${path}`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+          credentials: "include"
+      });
+      if(res.status!==200)
+        throw new Error('error');
+      return res;
+
+    }
+    catch (error){
+      await triggerUpdate();
+      const res = await fetch(`http://localhost:3001${path}`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+          credentials: "include"
+      });
+      if(res.status!==200)
+        return null;
+
+      return res;
+    }
+  }
+
+
+  const triggerUpdate = async () => {
     try {
       const res = await fetch('http://localhost:3001/api/auth/whoami', {
           method: "GET",
           headers: {"Content-Type": "application/json"},
           credentials: "include"
       });
-      if (res.ok) {
-        const result = await res.json();
-        setIsLoggedIn(true);
-        setUserRoleFcn(result.rolename)
-        setUserNameFcn(result.username)
-        localStorage.setItem('isLoggedIn', true);
-    } 
-
-  } catch (error) {
-      console.error("Wystąpił błąd:", error);
+      if(res.status!==200)
+        throw new Error('error');
+      setUser(await res.json());
+    }
+    catch (error){
+        setUser(null);
+        navigate('/login')
+    }
   }
-  };
 
-  const logout =async () => {
-    try {
-      const res = await fetch('http://localhost:3001/api/auth/logout', {
-          method: "POST", 
-          headers: {"Content-Type": "application/json"},
-          credentials: "include"
+
+  const authedPost = async(path, body) => {
+    try{
+      const result = await fetch(`http://localhost:3001${path}`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
-  
-      if (res.status == 200) {
-        setIsLoggedIn(false);
-        localStorage.setItem('isLoggedIn', false);
-      }
-  } catch (error) {
-      console.error("Wystąpił błąd:", error);
+      if(result.status!==200)
+        throw new Error('error');
+
+      return result;
+
+    }
+    catch(error){
+      await triggerUpdate();
+      const result = await fetch(`http://localhost:3001${path}`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      if(result.status!==200)
+        return null;
+
+      return result;
+    }
   }
 
-  };
+
+  useEffect(() => {
+    triggerUpdate();
+  }, []);
+
 
   return (
-    <AuthContext.Provider value={{ loggedIn, login, logout }}>
+    <AuthContext.Provider value={{user, triggerUpdate, authedPost, authedGet, unAuthedGet, unAuthedPost}}>
       {children}
     </AuthContext.Provider>
   );

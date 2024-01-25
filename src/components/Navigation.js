@@ -3,37 +3,44 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import {  Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { useRole } from './RoleContext';
-const navigation = [
-  { name: 'Wątki', href: '/watki', admin: false},
-  { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
-  { name: 'Usuń wątek', href: '/usun-watek', admin: false },
-  
-]
 
-const adminNavigation  = [
-  { name: 'Wątki', href: '/watki', admin: false},
-  { name: 'Dodaj wątek', href: '/dodaj-watek', admin: false },
-  { name: 'Usuń wątek', href: '/usun-watek', admin: false },
-  { name: 'Pokaż użytkowników ', href: '/pokaz-uzytkownikow', admin: true },
+const navigation  = [
+  { name: 'Wątki', href: '/watki',  requiredRole: null},
+  { name: 'Dodaj wątek', href: '/dodaj-watek', requiredRole: null},
+  { name: 'Usuń wątek', href: '/usun-watek', requiredRole: "Content Moderator"},
+  { name: 'Pokaż użytkowników ', href: '/pokaz-uzytkownikow', requiredRole: 'Community Moderator'},
 ]
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function Navigation() {
-  const {logout} = useAuth();
+  const {user, authedPost, triggerUpdate} = useAuth();
   const navigate = useNavigate();
-  const {userRole} = useRole()
   const [navigationVariable, setNavigationVariable] = useState(navigation)
 
-  useEffect(()=> {
-    setNavigationVariable(userRole == 'Admin' ? adminNavigation : navigation)
-  }, [])
-  const handleLogOut = () => {
-    logout()
-    navigate("/login")
-  }
+
+  const logout = async () => {
+    try{
+      const res = await authedPost('/api/auth/logout', {});
+
+      if (res === null)
+        throw new Error('error');
+
+    }
+    catch(error){
+
+    }
+    finally{
+        await triggerUpdate();
+        navigate("/login");
+    }
+
+
+  };
+
+
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -63,6 +70,7 @@ export default function Navigation() {
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
                     {navigationVariable.map((item) => (
+                      item.requiredRole === null ||  user.rolename==="Admin" || item.requiredRole===user.rolename?
                       <Link
                         key={item.name}
                         to={item.href}
@@ -74,14 +82,21 @@ export default function Navigation() {
                       >
                         {item.name}
                       </Link>
+                      :
+                      <></>
                     ))}
                   </div>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
- 
-                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-2 py-1 text-xs font-medium text-white " onClick={handleLogOut}> Log out</button>
-                         
+                {
+                  user!==null?
+                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-3 py-2 text-base font-bold text-white " onClick={logout}> Log out</button>
+                  :
+                  <button className="outline-0 inline-flex items-center rounded-md bg-red-400 px-3 py-2 text-base font-bold text-white " onClick={() => navigate('/login')}> Log in</button>
+
+                }
+
               </div>
             </div>
           </div>

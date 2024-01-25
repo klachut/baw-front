@@ -1,36 +1,51 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from './AuthContext';
-import { useRole } from './RoleContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useStyles } from './StylesContext';
 
-const Login = () => {
+
+
+
+const Login = (props) => {
+
     const [userName, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const {login} = useAuth();
+    const {user, unAuthedPost, triggerUpdate} = useAuth();
+    const styles = useStyles();
 
 
     const handleLogin = async () => {
         try {
-          const response = await fetch('http://localhost:3001/api/auth/login', {
-            method: "POST",
-            body: JSON.stringify({
+          const response = await unAuthedPost('/api/auth/login', {
                 login: userName,
                 password: password,
-            }),
-            headers: {"Content-Type": "application/json"},
-            credentials: "include"
-        });
-          await login();
+            });
+
+        if(response === null)
+          throw new Error("error")
+
+        toast.success('Użytkownik zalogowany!', styles.toast);
+        await triggerUpdate();
+        setTimeout(() => {
           navigate('/watki')
+        }, 2000);
 
         } catch (error) {
-      }
-    };
+          toast.error('Nie udało się zalogować!', styles.toast);
+
+        }
+      };
 
 
-  
+      useEffect(()=>{
+        if(user!==null)
+          navigate('/watki')
+      }, [user])
+
+
     return (
        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -40,7 +55,7 @@ const Login = () => {
             alt="Your Company"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+            Zaloguj się do swojego konta!
           </h2>
         </div>
 
@@ -48,15 +63,15 @@ const Login = () => {
           <div className="space-y-6" >
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
+                Nazwa użytkownika
               </label>
               <div className="mt-2">
                 <input
                   id="username"
                   name="username"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  value={userName} onChange={(e) => setUsername(e.target.value)} 
+                  className="block w-full rounded-md border-0 px-4 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={userName} onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>
@@ -64,7 +79,7 @@ const Login = () => {
             <div>
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
+                  Hasło
                 </label>
               </div>
               <div className="mt-2">
@@ -74,7 +89,7 @@ const Login = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full px-4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={password} onChange={(e) => setPassword(e.target.value)}
                />
               </div>
@@ -91,14 +106,13 @@ const Login = () => {
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{' '}
+            Nie masz konta? {"  "}
             <Link to="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-             Register now
+             Zarejestruj się!
             </Link>
           </p>
         </div>
       </div>
-    // </>
     );
 }
 
